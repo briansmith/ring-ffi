@@ -41,6 +41,13 @@ pub unsafe fn ring_digest_context_new(algorithm: *const ring::digest::Algorithm)
     heap_mut_ptr(ring::digest::Context::new(&*algorithm))
 }
 
+/// Clones a context
+#[no_mangle]
+pub unsafe fn ring_digest_context_clone(ctx: *mut ring::digest::Context)
+                -> *mut ring::digest::Context {
+    ctx.clone()
+}
+
 /// Calls `ctx.update()` with the given data.
 #[no_mangle]
 pub unsafe fn ring_digest_context_update(ctx: *mut ring::digest::Context,
