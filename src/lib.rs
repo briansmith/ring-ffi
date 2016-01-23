@@ -1,5 +1,16 @@
 extern crate ring;
 
+/// Moves `x` onto the heap and returns a mutable pointer to it.
+fn heap_mut_ptr<T>(x: T) -> *mut T {
+    Box::into_raw(Box::new(x))
+}
+
+/// Clones `*x` onto the heap and returns a mutable pointer to it.
+unsafe fn clone_heap_mut_ptr<T: Clone>(x: *const T) -> *mut T {
+    heap_mut_ptr((*x).clone())
+}
+
+
 macro_rules! wrap_algorithm {
     ( $wrapper_name:ident, $t:ty, $alg:expr ) => {
         /// Do NOT free the resulting pointer.
@@ -27,7 +38,7 @@ pub unsafe fn ring_digest_context_new(algorithm: *const ring::digest::Algorithm)
     if algorithm.is_null() {
         return std::ptr::null_mut();
     }
-    Box::into_raw(Box::new(ring::digest::Context::new(&*algorithm)))
+    heap_mut_ptr(ring::digest::Context::new(&*algorithm))
 }
 
 /// Calls `ctx.update()` with the given data.
@@ -58,4 +69,11 @@ pub unsafe fn ring_digest_context_finish(ctx: *mut ring::digest::Context,
 #[no_mangle]
 pub unsafe fn ring_digest_context_delete(ctx: *mut ring::digest::Context) {
     let _ = Box::from_raw(ctx);
+}
+
+/// Clones a digest context, returning a pointer to the clone.
+#[no_mangle]
+pub unsafe fn ring_digest_context_clone(ctx: *mut ring::digest::Context)
+                                        -> *mut ring::digest::Context {
+    clone_heap_mut_ptr(ctx)
 }
