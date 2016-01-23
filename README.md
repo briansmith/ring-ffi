@@ -27,7 +27,7 @@ Language     | Bindings
 ------------ | --------
 Ruby         | [ruby-ring](https://github.com/cryptosphere/ruby-ring)
 Rust         | Just use the native [*ring*](https://github.com/briansmith/ring) API.
-
+Python       | [cryptography-ring](https://github.com/reaperhulk/cryptography-ring)
  
 
 Contributing
